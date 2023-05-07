@@ -4,6 +4,7 @@ import { RevealMain, Slides, Section } from '../Reveal'
 
 export default function PageHome() {
   return (
+    
     <RevealMain>
       <Slides>
         <Section data-background-opacity="0.5">
