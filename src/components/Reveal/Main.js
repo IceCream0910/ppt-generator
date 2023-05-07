@@ -22,10 +22,11 @@ export default function RevealMain({ children }) {
       deck = new RevealJS(revealRef.current)
       deck
         .initialize({
-          controls: false,
+          controls: true,
           progress: true,
-          history: true,
+          history: false,
           center: true,
+          autoPlayMedia: true,
           transition: 'slide'
         })
         .then(e => {

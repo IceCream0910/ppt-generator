@@ -1,14 +1,25 @@
 /* eslint-disable react/prop-types */
 import '../components/Reveal/revealjs/css/reveal.css'
-import '../components/Reveal/revealjs/css/theme/white.css'
-
+import '../components/Reveal/revealjs/css/theme/black.css'
 import ThemeContainer from '../components/ThemeContainer'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark'
+  },
+  shape: {
+    borderRadius: 8,
+  }
+});
 
 function MyApp({ Component, pageProps }) {
   return (
-    <ThemeContainer>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
       <Component {...pageProps} />
-    </ThemeContainer>
+    </ThemeProvider>
   )
 }
 
