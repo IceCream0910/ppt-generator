@@ -1,8 +1,6 @@
 import React, { useEffect } from "react"
-import Pages from '../components/pages'
 import { useState } from "react"
 import { useRouter } from 'next/router'
-import { RevealMain, Section, Slides } from "~/components/Reveal"
 import TextField from "@mui/material/TextField"
 import Button from "@mui/material/Button"
 import IonIcon from "@reacticons/ionicons"

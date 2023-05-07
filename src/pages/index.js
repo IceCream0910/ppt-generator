@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import TextField from '@mui/material/TextField';
@@ -7,7 +7,6 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import { Section, Slides } from "~/components/Reveal"
 
 export default function Home() {
   const router = useRouter();
