@@ -54,7 +54,7 @@ export default function Home() {
     setResult('')
     let messages = [];
     messages.unshift({role: "system", content: `
-    Generate around 3 slides in korean.
+    Generate around 10 slides in korean.
 You do not need to add any additional replies or explanations.
 I will offer you subject of presentation.
 First, you should generate the Global title of the presentation.
