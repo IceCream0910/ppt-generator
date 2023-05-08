@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import TextField from '@mui/material/TextField';
@@ -22,15 +22,23 @@ export default function Home() {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '90%',
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: '#1a1a1a',
+    border: '#353535 2px solid',
+    outline: 'none',
     boxShadow: 24,
+    borderRadius: '15px',
     p: 4,
   };
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  var progressTimer;
 
+  useEffect(() => {
+    return () => {
+      clearInterval(progressTimer);
+    };
+  }, []);
 
   function isJson(str) {
     try {
@@ -42,15 +50,16 @@ export default function Home() {
   }
 
   const send = async () => {
+    if(!prompt) return;
     setResult('')
     let messages = [];
     messages.unshift({role: "system", content: `
-    Generate around 10 slides in korean.
+    Generate around 3 slides in korean.
 You do not need to add any additional replies or explanations.
 I will offer you subject of presentation.
 First, you should generate the Global title of the presentation.
 Each title corresponds to one content page, with a maximum of 100 words per page. Conciseness is key. Content of slides should be form of simple sentences.
-The dividing line between slides is "---" necessarily.
+The dividing line between slides is "---" necessarily and end of last slide is not marked '---'.
 
 This is example:
 <h2>Global Title</h2>
@@ -65,7 +74,7 @@ This is example:
     Subject : ${prompt}.\n\n
     `});
 
-    const timer = setInterval(() => {
+    progressTimer = setInterval(() => {
       setProgress((oldProgress) => {
         if (oldProgress === 100) {
           return 0;
@@ -113,6 +122,13 @@ This is example:
       });
   }
 
+  const onEnterPress = (e) => {
+    if (e.keyCode == 13 && e.shiftKey == false) {
+      send();
+      e.preventDefault();
+    }
+  }
+
 
   return (
     <>
@@ -132,10 +148,13 @@ This is example:
 
 
       <div className={'main-container'}>
-      <TextField fullWidth label="주제" id="fullWidth" onChange={() => setPrompt(event.target.value)} style={{borderRadius: '20px 0 0 20px'}}/>
-      <Button variant="contained" onClick={() => send()} style={{width: '70px', height: '55px', borderRadius: '0 20px 20px 0'}}
-      disabled={isDisabled}>생성</Button>
 
+      <div className={'input-container'}>
+        <input className={'input'} placeholder={'어떤 주제로 프리젠테이션을 만들까요?'} onChange={() => setPrompt(event.target.value)} onKeyDown={onEnterPress}/>
+        <Button variant="text" onClick={() => send()}
+                style={{width: '70px', height: '55px', position: 'absolute', color: '#fff', fontSize: '20px', opacity: '0.8'}}
+                disabled={isDisabled}>✨</Button>
+      </div>
       <style jsx>{`
         .main-container {
           display: flex;
@@ -144,8 +163,28 @@ This is example:
           align-items: center;
           height: 100vh;
           width: 100vw;
-          padding:50px;
-          background:#1c1e20;
+          padding: 50px;
+          background: #000;
+        }
+
+        .input-container {
+          width: 90%;
+        }
+
+        .input {
+          width: 100%;
+          padding: 15px 20px;
+          background: #1a1a1a;
+          border: #353535 2px solid;
+          color: #cccccc;
+          font-size: 20px;
+          border-radius: 15px;
+          outline: none;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          -moz-backdrop-filter: blur(10px);
+          -ms-backdrop-filter: blur(10px);
+          -o-backdrop-filter: blur(10px);
         }
       `}
       </style>

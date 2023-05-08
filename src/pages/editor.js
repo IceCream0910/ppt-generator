@@ -7,31 +7,53 @@ import IonIcon from "@reacticons/ionicons"
 
 export default function Home() {
   const router = useRouter();
-  const { data } = router.query;
+  var { data } = router.query;
+
   const [slides, setSlides] = useState([]);
   const [title, setTitle] = useState('');
   const [h2Values, setH2Values] = useState([]);
   const [pValues, setPValues] = useState([]);
+  const [lastSave, setLastSave] = useState('');
 
 
   useEffect(() => {
-    const splitText = data.split("---\n");
-    setSlides(splitText);
-    console.log(splitText)
+    if (data) {
+      const splitText = data.split("---\n");
+      setSlides(splitText);
 
-    splitText.forEach((slideText, index) => {
-      console.log(slideText, index)
-      if(index === 0) {
-        setTitle(slideText.match(/<h2>(.*)<\/h2>/)[1])
-        return;
-      }
-      const h2Match = slideText.match(/<h2>(.*)<\/h2>/);
-      setH2Values(prevH2Values => [...prevH2Values, h2Match[1]])
+      splitText.forEach((slideText, index) => {
+        if (index === 0) {
+          setTitle(slideText.match(/<h2>(.*)<\/h2>/)[1]);
+          return;
+        }
+        const h2Match = slideText.match(/<h2>(.*)<\/h2>/);
+        setH2Values(prevH2Values => [...prevH2Values, h2Match[1]]);
 
-      const pMatch = slideText.match(/<p>(.*)<\/p>/);
-      setPValues(prevPValues => [...prevPValues, pMatch[1]])
-    });
+        const pMatch = slideText.match(/<p>(.*)<\/p>/);
+        setPValues(prevPValues => [...prevPValues, pMatch[1]]);
+      });
+    }
+
+    const now = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+    setLastSave(now);
+    localStorage.setItem('lastSlide_data', data);
+
   }, []);
+
+
+  const save = () => {
+    let finalResult = '';
+    finalResult += `<h2>${title}</h2>\n---\n`;
+    slides.forEach((slide, index) => {
+        if(index === 0) return;
+        finalResult += `<h2>${h2Values[index - 1]}</h2>\n<p>${pValues[index - 1]}</p>\n---\n`
+      }
+    )
+    const now = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+    setLastSave(now);
+
+    localStorage.setItem('lastSlide_data', finalResult);
+  }
 
   const complete = () => {
     let finalResult = '';
@@ -42,6 +64,10 @@ export default function Home() {
     }
     )
 
+    const now = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+    setLastSave(now);
+    localStorage.setItem('lastSlide_data', finalResult);
+
     router.push({
       pathname : '/slides',
       query : {
@@ -50,23 +76,34 @@ export default function Home() {
     }, "/slides")
   }
 
-
-
-
   if (data) {
     return (
       <div className={'main-container'}>
         <div className={'header'}>
-          <Button variant="contained" onClick={() => complete()}>
-            <IonIcon style={{marginTop: '-10px', fontSize: '20px'}} name="arrow-forward" />&nbsp;&nbsp;완료
+          <Button variant="text" onClick={() => router.back()}>
+            <IonIcon style={{marginTop: '-10px', fontSize: '20px'}} name="chevron-back" />&nbsp;&nbsp;처음으로
           </Button>
+
+          <div style={{display:'flex', flexDirection: 'row', gap: '15px', height: '30px', alignItems: 'center'}}>
+            {lastSave && <span style={{ opacity: "0.8", color: '#a9a9a9' }}>마지막 수정 : {lastSave}</span>}
+            <Button variant="outlined" onClick={() => save()}>
+              <IonIcon style={{marginTop: '-10px', fontSize: '20px'}} name="save-outline" />&nbsp;&nbsp;저장
+            </Button>
+            <Button variant="outlined" onClick={() => complete()}>
+              <IonIcon style={{marginTop: '-10px', fontSize: '20px'}} name="expand" />&nbsp;&nbsp;슬라이드쇼 시작
+            </Button>
+          </div>
+
         </div>
 
-        <TextField label="프리젠테이션 제목" defaultValue={title} onChange={(e) => setTitle(e.target.value)} />
+        <br/><br/>
+
+        {title && <TextField label="프리젠테이션 제목" defaultValue={title} onChange={(e) => setTitle(e.target.value)} />}
 
         {slides.map((slide, index) => {
           return (
             <div className={'slide-container'} key={index}>
+              <label style={{color: '#ccc'}}>슬라이드{index+1}</label>
               <TextField
                 label="제목"
                 defaultValue={h2Values[index]}
@@ -98,6 +135,20 @@ export default function Home() {
             justify-content: center;
             padding: 50px;
             background: #1c1e20;
+            overflow: scroll;
+          }
+
+          .header {
+            display: flex;
+            justify-content: space-between;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            background-color: rgba(28, 30, 32, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10;
           }
 
           .slide-container {
@@ -118,4 +169,10 @@ export default function Home() {
   return (
     <h3>error</h3>
   )
+}
+
+export async function getServerSideProps(context) {
+  return {
+    props: {},
+  };
 }
